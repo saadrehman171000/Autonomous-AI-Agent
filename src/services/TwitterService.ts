@@ -103,9 +103,11 @@ export class TwitterService {
     
     for (let i = 0; i < this.maxRetries; i++) {
       try {
+        logger.info(`[DEBUG] Attempting Twitter API operation (try ${i + 1}/${this.maxRetries}) at ${new Date().toISOString()}`);
         return await operation();
       } catch (error: any) {
         lastError = error;
+        logger.error('[DEBUG] Twitter API error object:', { error });
         
         // Handle X API specific errors
         if (this.isApiError(error)) {
@@ -113,6 +115,7 @@ export class TwitterService {
         }
         
         if (error.code === 429 || (typeof error.message === 'string' && error.message.includes('Rate limit'))) {
+          logger.error('[DEBUG] Handling rate limit error:', { error });
           await this.handleRateLimit(error);
         } else {
           throw error;
@@ -144,6 +147,7 @@ export class TwitterService {
         await this.initializeUserId();
       }
       
+      logger.info('[DEBUG] About to fetch mentions from Twitter', { timestamp: new Date().toISOString(), sinceId });
       logger.info('Fetching mentions...', { sinceId });
       const response = await this.retryOperation(() => 
         this.client.v2.userMentionTimeline(this.userId, {
@@ -184,7 +188,7 @@ export class TwitterService {
         rateLimit: response.rateLimit as RateLimit 
       };
     } catch (error) {
-      logger.error('Failed to fetch mentions:', error);
+      logger.error('[DEBUG] Failed to fetch mentions:', { error });
       throw error;
     }
   }

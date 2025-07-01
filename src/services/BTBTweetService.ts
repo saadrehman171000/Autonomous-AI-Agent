@@ -12,7 +12,7 @@ export class BTBTweetService {
   private processedTweetIds: Set<string> = new Set(); // Track ALL replied tweets
   private isProcessing: boolean = false;
   private nextPollTime: Date = new Date();
-  private defaultIntervalMs: number = 300000; // 5 minutes default
+  private defaultIntervalMs: number = 900000; // 15 minutes default
 
   // --- Real-time stats and feed ---
   private mentionsReplied = 0;
@@ -275,7 +275,7 @@ export class BTBTweetService {
   }
 
   // Start processing tweets at regular intervals
-  async startProcessing(intervalMs: number = 300000): Promise<void> { // Default to 5 minutes for testing
+  async startProcessing(intervalMs: number = 900000): Promise<void> { // Default to 15 minutes for free API
     this.defaultIntervalMs = intervalMs;
     logger.info('Starting $BTB tweet processing...', { intervalMs });
     
