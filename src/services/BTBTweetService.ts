@@ -92,17 +92,11 @@ export class BTBTweetService {
   }
 
   private updateNextPollTime(rateLimit?: RateLimit): void {
-    if (rateLimit?.remaining === 0 && rateLimit?.reset) {
-      // Convert reset timestamp to milliseconds and add 1 second buffer
-      const resetTime = new Date(rateLimit.reset * 1000 + 1000);
-      this.nextPollTime = resetTime;
-      logger.info('Updated next poll time due to rate limit', {
-        nextPoll: this.nextPollTime.toISOString(),
-      });
-    } else {
-      // Use default interval if no rate limit info
-      this.nextPollTime = new Date(Date.now() + this.defaultIntervalMs);
-    }
+    // Always use a short delay (15 seconds) after a rate limit for immediate replies
+    this.nextPollTime = new Date(Date.now() + 15000); // 15 seconds
+    logger.info('Next poll time set to 15 seconds from now due to rate limit', {
+      nextPoll: this.nextPollTime.toISOString(),
+    });
   }
 
   private async sleep(ms: number): Promise<void> {
